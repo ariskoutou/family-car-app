@@ -15,20 +15,29 @@ def get_db_connection():
     return conn
 
 def init_db():
-    if not os.path.exists(DB_FILE):
-        conn = get_db_connection()
-        conn.execute('''
-            CREATE TABLE car_requests (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                driver TEXT NOT NULL,
-                date TEXT NOT NULL,
-                time TEXT NOT NULL,
-                reason TEXT NOT NULL,
-                status TEXT DEFAULT 'Εκκρεμεί'
-            )
-        ''')
-        conn.commit()
-        conn.close()
+    conn = get_db_connection()
+    # Πίνακας για τα αιτήματα
+    conn.execute('''
+        CREATE TABLE IF NOT EXISTS car_requests (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            driver TEXT NOT NULL,
+            date TEXT NOT NULL,
+            time TEXT NOT NULL,
+            reason TEXT NOT NULL,
+            status TEXT DEFAULT 'Εκκρεμεί'
+        )
+    ''')
+    # Πίνακας για τον κωδικό πρόσβασης
+    conn.execute('''
+        CREATE TABLE IF NOT EXISTS settings (
+            key TEXT PRIMARY KEY,
+            value TEXT NOT NULL
+        )
+    ''')
+    # Αν δεν υπάρχει ήδη κωδικός, βάζουμε τον αρχικό '1234'
+    conn.execute("INSERT OR IGNORE INTO settings (key, value) VALUES ('parents_password', '1234')")
+    conn.commit()
+    conn.close()
 
 init_db()
 
@@ -55,7 +64,6 @@ def index():
     raw_requests = conn.execute('SELECT * FROM car_requests ORDER BY id DESC').fetchall()
     conn.close()
     
-    # Μετατροπή ημερομηνίας για την αρχική σελίδα
     requests = []
     for r in raw_requests:
         req_dict = dict(r)
@@ -98,14 +106,39 @@ def calendar_page():
 
 @app.route('/parents', methods=['GET', 'POST'])
 def parents_login():
+    conn = get_db_connection()
+    db_pass = conn.execute("SELECT value FROM settings WHERE key = 'parents_password'").fetchone()
+    conn.close()
+    current_password = db_pass['value'] if db_pass else '1234'
+
     if request.method == 'POST':
         password = request.form.get('password')
-        if password == '1234':
+        if password == current_password:
             return redirect(url_for('parents_dashboard'))
         else:
             flash('Λάθος κωδικός! Προσπαθήστε ξανά.', 'danger')
             return redirect(url_for('parents_login'))
     return render_template('parents_login.html')
+
+@app.route('/parents/change-password', methods=['POST'])
+def change_password():
+    old_password = request.form.get('old_password')
+    new_password = request.form.get('new_password')
+
+    conn = get_db_connection()
+    db_pass = conn.execute("SELECT value FROM settings WHERE key = 'parents_password'").fetchone()
+    current_password = db_pass['value'] if db_pass else '1234'
+
+    if old_password == current_password:
+        conn.execute("UPDATE settings SET value = ? WHERE key = 'parents_password'", (new_password,))
+        conn.commit()
+        conn.close()
+        flash('Ο κωδικός άλλαξε επιτυχώς!', 'success')
+    else:
+        conn.close()
+        flash('Ο παλιός κωδικός είναι λανθασμένος. Η αλλαγή απέτυχε.', 'danger')
+        
+    return redirect(url_for('parents_login'))
 
 @app.route('/parents/dashboard')
 def parents_dashboard():
@@ -113,14 +146,11 @@ def parents_dashboard():
     raw_requests = conn.execute("SELECT * FROM car_requests WHERE status = 'Εκκρεμεί' ORDER BY id DESC").fetchall()
     conn.close()
     
-    # Μετατροπή ημερομηνίας σε Ημέρα/Μήνας/Χρονιά για το Dashboard των γονέων
     formatted_requests = []
     for r in raw_requests:
         req_dict = dict(r)
         try:
-            # Μετατρέπει το YYYY-MM-DD σε αντικείμενο ημερομηνίας
             date_obj = datetime.strptime(req_dict['date'], '%Y-%m-%d')
-            # Το μορφοποιεί σε DD/MM/YYYY
             req_dict['date'] = date_obj.strftime('%d/%m/%Y')
         except:
             pass
