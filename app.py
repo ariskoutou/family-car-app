@@ -1,7 +1,7 @@
 import os
 import sqlite3
 import json
-from datetime import datetime
+from datetime import datetime, date as dt_date
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 
 app = Flask(__name__)
@@ -16,7 +16,6 @@ def get_db_connection():
 
 def init_db():
     conn = get_db_connection()
-    # Πίνακας για τα αιτήματα
     conn.execute('''
         CREATE TABLE IF NOT EXISTS car_requests (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -27,14 +26,12 @@ def init_db():
             status TEXT DEFAULT 'Εκκρεμεί'
         )
     ''')
-    # Πίνακας για τον κωδικό πρόσβασης
     conn.execute('''
         CREATE TABLE IF NOT EXISTS settings (
             key TEXT PRIMARY KEY,
             value TEXT NOT NULL
         )
     ''')
-    # Αν δεν υπάρχει ήδη κωδικός, βάζουμε τον αρχικό '1234'
     conn.execute("INSERT OR IGNORE INTO settings (key, value) VALUES ('parents_password', '1234')")
     conn.commit()
     conn.close()
@@ -60,8 +57,10 @@ def index():
         conn.close()
         return redirect(url_for('index'))
 
+    # Φιλτράρισμα: Παίρνουμε μόνο τα αιτήματα που η ημερομηνία τους είναι σημερινή ή μελλοντική
+    today_str = dt_date.today().strftime('%Y-%m-%d')
     conn = get_db_connection()
-    raw_requests = conn.execute('SELECT * FROM car_requests ORDER BY id DESC').fetchall()
+    raw_requests = conn.execute('SELECT * FROM car_requests WHERE date >= ? ORDER BY id DESC', (today_str,)).fetchall()
     conn.close()
     
     requests = []
@@ -142,8 +141,10 @@ def change_password():
 
 @app.route('/parents/dashboard')
 def parents_dashboard():
+    # Φιλτράρισμα και στο dashboard των γονέων για να μην βλέπουν παλιά εκκρεμή
+    today_str = dt_date.today().strftime('%Y-%m-%d')
     conn = get_db_connection()
-    raw_requests = conn.execute("SELECT * FROM car_requests WHERE status = 'Εκκρεμεί' ORDER BY id DESC").fetchall()
+    raw_requests = conn.execute("SELECT * FROM car_requests WHERE status = 'Εκκρεμεί' AND date >= ? ORDER BY id DESC", (today_str,)).fetchall()
     conn.close()
     
     formatted_requests = []
