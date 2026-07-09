@@ -64,7 +64,7 @@
                             <textarea class="form-control" name="reason" rows="3" placeholder="π.χ. Προπόνηση, Καφές με φίλους..." required></textarea>
                         </div>
 
-                        <button type="submit" class="btn btn-primary w-100 fw-bold py-2⚙️">Υποβολή Αιτήματος</button>
+                        <button type="submit" class="btn btn-primary w-100 fw-bold py-2">Υποβολή Αιτήματος</button>
                     </form>
                 </div>
             </div>
@@ -117,17 +117,14 @@
             var dateInput = document.getElementById('requestDate');
             var form = document.getElementById('carRequestForm');
             
-            // 1. Κλειδώνουμε αυτόματα τις περασμένες ημερομηνίες στο ημερολόγιο
             var today = new Date();
             var dd = String(today.getDate()).padStart(2, '0');
-            var mm = String(today.getMonth() + 1).padStart(2, '0'); // Ιανουάριος είναι 0
+            var mm = String(today.getMonth() + 1).padStart(2, '0');
             var yyyy = today.getFullYear();
             var todayString = yyyy + '-' + mm + '-' + dd;
             
-            // Το 'min' attribute εμποδίζει την επιλογή προηγούμενων ημερών
             dateInput.setAttribute('min', todayString);
 
-            // 2. Έλεγχος κατά την υποβολή της φόρμας για την ώρα της ίδιας μέρας
             form.addEventListener('submit', function(event) {
                 var selectedDate = dateInput.value;
                 var timeFromInput = document.getElementById('timeFrom').value;
@@ -138,16 +135,14 @@
                 var currentMinutes = String(now.getMinutes()).padStart(2, '0');
                 var currentTimeString = currentHours + ':' + currentMinutes;
 
-                // Αν επιλεχθεί η σημερινή μέρα, έλεγξε την ώρα
                 if (selectedDate === todayString) {
                     if (timeFromInput < currentTimeString) {
                         alert('Δεν μπορείτε να επιλέξετε ώρα που έχει ήδη περάσει για σήμερα!');
-                        event.preventDefault(); // Σταματάει την υποβολή
+                        event.preventDefault();
                         return false;
                     }
                 }
 
-                // Έλεγχος αν η ώρα "Έως" είναι πριν από την ώρα "Από"
                 if (timeToInput <= timeFromInput) {
                     alert('Η ώρα λήξης πρέπει να είναι μετά την ώρα έναρξης!');
                     event.preventDefault();
