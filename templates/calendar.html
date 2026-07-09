@@ -11,7 +11,7 @@
         .navbar { background-color: #343a40; }
         .card { border: none; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         #calendar { background: white; padding: 20px; border-radius: 12px; }
-        .fc-event { cursor: pointer; padding: 2px 5px; font-size: 0.9em; }
+        .fc-event { cursor: pointer; padding: 4px 6px; font-size: 0.9em; white-space: normal !important; }
         .legend-box { width: 20px; height: 20px; border-radius: 4px; display: inline-block; vertical-align: middle; }
     </style>
 </head>
@@ -48,7 +48,6 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             var calendarEl = document.getElementById('calendar');
-            // Διαβάζουμε τα events που στέλνει η Python
             var eventsData = {{ events_json | safe }};
 
             var calendar = new FullCalendar.Calendar(calendarEl, {
@@ -60,9 +59,22 @@
                     center: 'title',
                     right: 'dayGridMonth,timeGridWeek'
                 },
+                // Μετάφραση των κουμπιών στα Ελληνικά
+                buttonText: {
+                    today: 'Σήμερα',
+                    month: 'Μήνας',
+                    week: 'Εβδομάδα'
+                },
                 events: eventsData,
+                // Ρύθμιση για να μην κόβεται το κείμενο και να φαίνεται όλη η ώρα
+                eventContent: function(arg) {
+                    let titleEl = document.createElement('div');
+                    titleEl.innerHTML = '<b>' + arg.event.title + '</b>';
+                    
+                    let arrayOfNodes = [ titleEl ];
+                    return { domNodes: arrayOfNodes };
+                },
                 eventDidMount: function(info) {
-                    // Προσθήκη tooltip με τον σκοπό του ταξιδιού όταν περνάει το ποντίκι
                     if (info.event.extendedProps.description) {
                         info.el.setAttribute('title', info.event.extendedProps.description);
                     }
