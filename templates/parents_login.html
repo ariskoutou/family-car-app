@@ -3,41 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Είσοδος Γονέων</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <title>Είσοδος Γονέων - Family Car Planner</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body { background-color: #f8f9fa; font-family: 'Segoe UI', sans-serif; }
-        .card { border: none; border-radius: 12px; box-shadow: 0 4px-6px rgba(0,0,0,0.05); max-width: 400px; width: 100%; }
+        .navbar { background-color: #343a40; }
+        .card { border: none; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); max-width: 400px; margin: 0 auto; }
+        .btn-dark { background-color: #212529; }
     </style>
 </head>
-<body class="d-flex align-items-center justify-content-center vh-100">
+<body>
 
-    <div class="card p-4">
-        <div class="text-center mb-4">
-            <h3 class="fw-bold text-dark">🔒 Περιοχή Γονέων</h3>
-            <p class="text-muted small">Εισάγετε τον κωδικό πρόσβασης για να διαχειριστείτε τα αιτήματα.</p>
+    <nav class="navbar navbar-expand-lg navbar-dark mb-5">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">🚗 Family Car Planner</a>
+            <div class="ms-auto">
+                <a href="/" class="btn btn-outline-light btn-sm">🏠 Αρχική</a>
+            </div>
         </div>
+    </nav>
 
+    <div class="container">
+        
         {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} text-center small py-2">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
+          {% if messages %}
+            <div class="max-width: 400px; margin: 0 auto;">
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }} alert-dismissible fade show text-center" role="alert">
+                {{ message }}
+              </div>
+            {% endfor %}
+            </div>
+          {% endif %}
         {% endwith %}
 
-        <form action="/parents" method="POST">
-            <div class="mb-3">
-                <label class="form-label small fw-bold">Κωδικός Πρόσβασης</label>
-                <input type="password" name="password" class="form-control text-center" placeholder="••••" required autofocus>
+        <div class="card p-4 mb-4" id="loginCard">
+            <h3 class="text-center fw-bold text-secondary mb-4">🔒 Περιοχή Γονέων</h3>
+            <form action="/parents" method="POST">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Εισάγετε τον Κωδικό Πρόσβασης</label>
+                    <input type="password" class="form-control text-center" name="password" placeholder="••••" required>
+                </div>
+                <button type="submit" class="btn btn-dark w-100 fw-bold py-2 mb-3">Είσοδος</button>
+            </form>
+            
+            <div class="text-center">
+                <button type="button" class="btn btn-link btn-sm text-decoration-none text-muted" onclick="toggleForms()">⚙️ Αλλαγή κωδικού</button>
             </div>
-            <button type="submit" class="btn btn-dark w-100 fw-bold">Είσοδος</button>
-        </form>
-        
-        <div class="text-center mt-3">
-            <a href="/" class="text-muted small text-decoration-none">← Επιστροφή στην Αρχική</a>
         </div>
+
+        <div class="card p-4 d-none" id="changePasswordCard">
+            <h3 class="text-center fw-bold text-secondary mb-4">⚙️ Αλλαγή Κωδικού</h3>
+            <form action="/parents/change-password" method="POST">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Παλιός Κωδικός</label>
+                    <input type="password" class="form-control" name="old_password" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Νέος Κωδικός</label>
+                    <input type="password" class="form-control" name="new_password" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 fw-bold py-2 mb-2">Αποθήκευση Νέου Κωδικού</button>
+                <button type="button" class="btn btn-light w-100 btn-sm" onclick="toggleForms()">Ακύρωση</button>
+            </form>
+        </div>
+
     </div>
 
+    <script>
+        // Λειτουργία που κρύβει το Login και εμφανίζει την Αλλαγή Κωδικού (και το αντίστροφο)
+        function toggleForms() {
+            var loginCard = document.getElementById('loginCard');
+            var changePasswordCard = document.getElementById('changePasswordCard');
+            
+            if(loginCard.classList.contains('d-none')) {
+                loginCard.classList.remove('d-none');
+                changePasswordCard.classList.add('d-none');
+            } else {
+                loginCard.classList.add('d-none');
+                changePasswordCard.classList.remove('d-none');
+            }
+        }
+    </script>
 </body>
 </html>
