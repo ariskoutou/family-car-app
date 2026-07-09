@@ -1,6 +1,7 @@
 import os
 import sqlite3
-from flask import Flask, render_template, request, redirect, url_for, flash
+import json
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 
 app = Flask(__name__)
 app.secret_key = 'family_secret_key_123'
@@ -28,7 +29,6 @@ def init_db():
         conn.commit()
         conn.close()
 
-# Αρχικοποίηση της βάσης δεδομένων κατά την εκκίνηση
 init_db()
 
 @app.route('/', methods=['GET', 'POST'])
@@ -37,7 +37,6 @@ def index():
         driver = request.form.get('driver')
         date = request.form.get('date')
         
-        # Παίρνουμε τις δύο επιλογές ώρας και τις ενώνουμε
         time_from = request.form.get('time_from')
         time_to = request.form.get('time_to')
         full_time = f"{time_from} - {time_to}"
@@ -56,11 +55,42 @@ def index():
     conn.close()
     return render_template('index.html', requests=requests)
 
+@app.route('/calendar')
+def calendar_page():
+    conn = get_db_connection()
+    requests = conn.execute("SELECT * FROM car_requests WHERE status != 'Απορρίφθηκε'").fetchall()
+    conn.close()
+    
+    # Μετατροπή των αιτημάτων σε μορφή FullCalendar Events
+    events = []
+    for r in requests:
+        # Χρώμα ανάλογα με την κατάσταση
+        color = '#ffc107' if r['status'] == 'Εκκρεμεί' else '#198754'
+        text_color = '#000000' if r['status'] == 'Εκκρεμεί' else '#ffffff'
+        
+        # Προσπαθούμε να πάρουμε την ώρα "Από" για να μπει σωστά στο ημερολόγιο
+        try:
+            time_start = r['time'].split(' - ')[0]
+            start_datetime = f"{r['date']}T{time_start}"
+        except:
+            start_datetime = r['date']
+
+        events.append({
+            'title': f"{r['driver']} ({r['time']})",
+            'start': start_datetime,
+            'description': r['reason'],
+            'backgroundColor': color,
+            'borderColor': color,
+            'textColor': text_color
+        })
+        
+    return render_template('calendar.html', events_json=json.dumps(events))
+
 @app.route('/parents', methods=['GET', 'POST'])
 def parents_login():
     if request.method == 'POST':
         password = request.form.get('password')
-        if password == '1234':  # Ο κωδικός πρόσβασης των γονέων
+        if password == '1234':
             return redirect(url_for('parents_dashboard'))
         else:
             flash('Λάθος κωδικός! Προσπαθήστε ξανά.', 'danger')
@@ -70,7 +100,6 @@ def parents_login():
 @app.route('/parents/dashboard')
 def parents_dashboard():
     conn = get_db_connection()
-    # Εμφανίζουμε μόνο τα αιτήματα που εκκρεμούν στον πίνακα ελέγχου των γονέων
     requests = conn.execute("SELECT * FROM car_requests WHERE status = 'Εκκρεμεί' ORDER BY id DESC").fetchall()
     conn.close()
     return render_template('parents_dashboard.html', requests=requests)
