@@ -12,7 +12,6 @@
         .btn-primary { background-color: #0d6efd; border: none; }
         .btn-primary:hover { background-color: #0b5ed7; }
         .status-badge { font-size: 0.85rem; padding: 6px 12px; border-radius: 20px; }
-        /* Κάνει τα πεδία να φαίνονται σαν μεγάλα, πατήσιμα μπλοκ */
         .clickable-block { cursor: pointer; height: 45px; }
     </style>
 </head>
@@ -55,13 +54,13 @@
                                 <label class="form-label fw-semibold">Από (Ώρα)</label>
                                 <select class="form-select clickable-block" name="time_from" id="timeFrom" required>
                                     <option value="" disabled selected>--:--</option>
-                                    </select>
+                                </select>
                             </div>
                             <div class="col">
                                 <label class="form-label fw-semibold">Έως (Ώρα)</label>
                                 <select class="form-select clickable-block" name="time_to" id="timeTo" required>
                                     <option value="" disabled selected>--:--</option>
-                                    </select>
+                                </select>
                             </div>
                         </div>
 
@@ -125,7 +124,6 @@
             var timeFromSelect = document.getElementById('timeFrom');
             var timeToSelect = document.getElementById('timeTo');
             
-            // 1. Δημιουργία των επιλογών ώρας ανά μισή ώρα (24ωρο)
             for (var h = 0; h < 24; h++) {
                 for (var m = 0; m < 60; m += 30) {
                     var hh = String(h).padStart(2, '0');
@@ -144,7 +142,6 @@
                 }
             }
 
-            // 2. Κλείδωμα περασμένων ημερομηνιών
             var today = new Date();
             var dd = String(today.getDate()).padStart(2, '0');
             var mm = String(today.getMonth() + 1).padStart(2, '0');
@@ -153,7 +150,6 @@
             
             dateInput.setAttribute('min', todayString);
 
-            // 3. Έλεγχοι κατά την υποβολή
             form.addEventListener('submit', function(event) {
                 var selectedDate = dateInput.value;
                 var timeFromInput = timeFromSelect.value;
@@ -172,8 +168,9 @@
                     }
                 }
 
+                // ΕΔΩ ΓΙΝΕΤΑΙ Ο ΑΥΣΤΗΡΟΣ ΕΛΕΓΧΟΣ ΓΙΑ ΤΗ ΛΑΘΟΣ/ΑΝΑΠΟΔΗ ΩΡΑ
                 if (timeToInput <= timeFromInput) {
-                    alert('Η ώρα λήξης πρέπει να είναι μετά την ώρα έναρξης!');
+                    alert('Λάθος επιλογή ώρας! Η ώρα λήξης (Έως) πρέπει υποχρεωτικά να είναι μετά την ώρα έναρξης (Από).');
                     event.preventDefault();
                     return false;
                 }
