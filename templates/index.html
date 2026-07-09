@@ -39,7 +39,7 @@
                             <label class="form-label fw-semibold">Ποιος θα οδηγήσει;</label>
                             <select class="form-select clickable-block" name="driver" required>
                                 <option value="" disabled selected>Επιλέξτε όνομα...</option>
-                                <option value="Γιάννης">Γιάννης</option>
+                                <option value="Άρης">Άρης</option>
                                 <option value="Χριστιάννα">Χριστιάννα</option>
                             </select>
                         </div>
@@ -168,7 +168,6 @@
                     }
                 }
 
-                // ΕΔΩ ΓΙΝΕΤΑΙ Ο ΑΥΣΤΗΡΟΣ ΕΛΕΓΧΟΣ ΓΙΑ ΤΗ ΛΑΘΟΣ/ΑΝΑΠΟΔΗ ΩΡΑ
                 if (timeToInput <= timeFromInput) {
                     alert('Λάθος επιλογή ώρας! Η ώρα λήξης (Έως) πρέπει υποχρεωτικά να είναι μετά την ώρα έναρξης (Από).');
                     event.preventDefault();
