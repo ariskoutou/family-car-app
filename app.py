@@ -1,6 +1,7 @@
 import os
 import sqlite3
 import json
+from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 
 app = Flask(__name__)
@@ -51,8 +52,20 @@ def index():
         return redirect(url_for('index'))
 
     conn = get_db_connection()
-    requests = conn.execute('SELECT * FROM car_requests ORDER BY id DESC').fetchall()
+    raw_requests = conn.execute('SELECT * FROM car_requests ORDER BY id DESC').fetchall()
     conn.close()
+    
+    # Μετατροπή ημερομηνίας για την αρχική σελίδα
+    requests = []
+    for r in raw_requests:
+        req_dict = dict(r)
+        try:
+            date_obj = datetime.strptime(req_dict['date'], '%Y-%m-%d')
+            req_dict['date'] = date_obj.strftime('%d/%m/%Y')
+        except:
+            pass
+        requests.append(req_dict)
+        
     return render_template('index.html', requests=requests)
 
 @app.route('/calendar')
@@ -61,14 +74,11 @@ def calendar_page():
     requests = conn.execute("SELECT * FROM car_requests WHERE status != 'Απορρίφθηκε'").fetchall()
     conn.close()
     
-    # Μετατροπή των αιτημάτων σε μορφή FullCalendar Events
     events = []
     for r in requests:
-        # Χρώμα ανάλογα με την κατάσταση
         color = '#ffc107' if r['status'] == 'Εκκρεμεί' else '#198754'
         text_color = '#000000' if r['status'] == 'Εκκρεμεί' else '#ffffff'
         
-        # Προσπαθούμε να πάρουμε την ώρα "Από" για να μπει σωστά στο ημερολόγιο
         try:
             time_start = r['time'].split(' - ')[0]
             start_datetime = f"{r['date']}T{time_start}"
@@ -100,9 +110,23 @@ def parents_login():
 @app.route('/parents/dashboard')
 def parents_dashboard():
     conn = get_db_connection()
-    requests = conn.execute("SELECT * FROM car_requests WHERE status = 'Εκκρεμεί' ORDER BY id DESC").fetchall()
+    raw_requests = conn.execute("SELECT * FROM car_requests WHERE status = 'Εκκρεμεί' ORDER BY id DESC").fetchall()
     conn.close()
-    return render_template('parents_dashboard.html', requests=requests)
+    
+    # Μετατροπή ημερομηνίας σε Ημέρα/Μήνας/Χρονιά για το Dashboard των γονέων
+    formatted_requests = []
+    for r in raw_requests:
+        req_dict = dict(r)
+        try:
+            # Μετατρέπει το YYYY-MM-DD σε αντικείμενο ημερομηνίας
+            date_obj = datetime.strptime(req_dict['date'], '%Y-%m-%d')
+            # Το μορφοποιεί σε DD/MM/YYYY
+            req_dict['date'] = date_obj.strftime('%d/%m/%Y')
+        except:
+            pass
+        formatted_requests.append(req_dict)
+        
+    return render_template('parents_dashboard.html', requests=formatted_requests)
 
 @app.route('/admin/decide/<int:request_id>/<string:action>')
 def decide_request(request_id, action):
