@@ -4,15 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Family Car Planner</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body { background-color: #f8f9fa; font-family: 'Segoe UI', sans-serif; }
         .navbar { background-color: #343a40; }
         .card { border: none; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .badge-pending { background-color: #ffc107; color: #000; padding: 6px 10px; border-radius: 20px; }
-        .badge-approved { background-color: #198754; color: #fff; padding: 6px 10px; border-radius: 20px; }
-        .badge-rejected { background-color: #dc3545; color: #fff; padding: 6px 10px; border-radius: 20px; }
-        .datepicker-clickable { cursor: pointer; }
+        .btn-primary { background-color: #0d6efd; border: none; }
+        .btn-primary:hover { background-color: #0b5ed7; }
+        .status-badge { font-size: 0.85rem; padding: 6px 12px; border-radius: 20px; }
     </style>
 </head>
 <body>
@@ -27,94 +26,135 @@
         </div>
     </nav>
 
-    <div class="container">
-        <div class="row">
-            <div class="col-md-5 mb-4">
+    <div class="container mb-5">
+        <div class="row g-4">
+            
+            <div class="col-lg-5">
                 <div class="card p-4">
-                    <h4 class="fw-bold mb-3 text-primary">Νέο Αίτημα</h4>
-                    <form action="/" method="POST">
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">Ποιος θα οδηγήσει;</label>
-                            <select name="driver" class="form-select" required>
-                                <option value="" disabled selected>Επιλέξτε όνομα...</option>
-                                <option value="Χριστιάννα">Χριστιάννα</option>
-                                <option value="Άρης">Άρης</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">Ημερομηνία</label>
-                            <input type="date" name="date" class="form-control datepicker-clickable" onclick="this.showPicker()" required>
-                        </div>
+                    <h3 class="fw-bold text-secondary mb-4">Νέο Αίτημα</h3>
+                    <form action="/" method="POST" id="carRequestForm">
                         
                         <div class="mb-3">
-                            <label class="form-label small fw-bold">Διάρκεια (Ώρα)</label>
-                            <div class="d-flex gap-2">
-                                <select name="time_from" class="form-select" required>
-                                    <option value="" disabled selected>Από...</option>
-                                    {% for hour in ['00:00','00:30','01:00','01:30','02:00','02:30','03:00','03:30','04:00','04:30','05:00','05:30','06:00','06:30','07:00','07:30','08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30','19:00','19:30','20:00','20:30','21:00','21:30','22:00','22:30','23:00','23:30'] %}
-                                        <option value="{{ hour }}">{{ hour }}</option>
-                                    {% endfor %}
-                                </select>
-                                <select name="time_to" class="form-select" required>
-                                    <option value="" disabled selected>Μέχρι...</option>
-                                    {% for hour in ['00:30','01:00','01:30','02:00','02:30','03:00','03:30','04:00','04:30','05:00','05:30','06:00','06:30','07:00','07:30','08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30','19:00','19:30','20:00','20:30','21:00','21:30','22:00','22:30','23:00','23:30','24:00'] %}
-                                        <option value="{{ hour }}">{{ hour }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
+                            <label class="form-label fw-semibold">Ποιος θα οδηγήσει;</label>
+                            <select class="form-select" name="driver" required>
+                                <option value="" disabled selected>Επιλέξτε όνομα...</option>
+                                <option value="Γιάννης">Γιάννης</option>
+                                <option value="Χριστιάννα">Χριστιάννα</option>
+                            </select>
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label small fw-bold">Σκοπός / Προορισμός</label>
-                            <textarea name="reason" class="form-control" rows="2" placeholder="π.χ. Καφέ, Προπόνηση..." required></textarea>
+                            <label class="form-label fw-semibold">Ημερομηνία</label>
+                            <input type="date" class="form-control" name="date" id="requestDate" required>
                         </div>
-                        <button type="submit" class="btn btn-primary w-100 fw-bold">Υποβολή Αιτήματος</button>
+
+                        <div class="row g-2 mb-3">
+                            <div class="col">
+                                <label class="form-label fw-semibold">Από (Ώρα)</label>
+                                <input type="time" class="form-control" name="time_from" id="timeFrom" required>
+                            </div>
+                            <div class="col">
+                                <label class="form-label fw-semibold">Έως (Ώρα)</label>
+                                <input type="time" class="form-control" name="time_to" id="timeTo" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Σκοπός / Προορισμός</label>
+                            <textarea class="form-control" name="reason" rows="3" placeholder="π.χ. Προπόνηση, Καφές με φίλους..." required></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 fw-bold py-2⚙️">Υποβολή Αιτήματος</button>
                     </form>
                 </div>
             </div>
 
-            <div class="col-md-7">
+            <div class="col-lg-7">
                 <div class="card p-4">
-                    <h4 class="fw-bold mb-3 text-secondary">Πρόγραμμα & Αιτήματα</h4>
+                    <h3 class="fw-bold text-secondary mb-4">Ιστορικό Αιτημάτων</h3>
                     <div class="table-responsive">
-                        <table class="table align-middle">
+                        <table class="table table-hover align-middle">
                             <thead class="table-light">
                                 <tr>
                                     <th>Οδηγός</th>
-                                    <th>Ημερομηνία / Ώρα</th>
-                                    <th>Σκοπός</th>
+                                    <th>Ημερομηνία</th>
+                                    <th>Ώρες</th>
                                     <th>Κατάσταση</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% if requests %}
-                                    {% for req in requests %}
-                                    <tr>
-                                        <td class="fw-bold">{{ req.driver }}</td>
-                                        <td>{{ req.date }} <br> <small class="text-muted">{{ req.time }}</small></td>
-                                        <td>{{ req.reason }}</td>
-                                        <td>
-                                            {% if req.status == 'Εκκρεμεί' %}
-                                                <span class="badge badge-pending">⏳ Εκκρεμεί</span>
-                                            {% elif req.status == 'Εγκρίθηκε' %}
-                                                <span class="badge badge-approved">✅ Εγκρίθηκε</span>
-                                            {% else %}
-                                                <span class="badge badge-rejected">❌ Απορρίφθηκε</span>
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
+                                {% for req in requests %}
+                                <tr>
+                                    <td class="fw-bold">{{ req.driver }}</td>
+                                    <td>{{ req.date }}</td>
+                                    <td>{{ req.time }}</td>
+                                    <td>
+                                        {% if req.status == 'Εκκρεμεί' %}
+                                            <span class="badge bg-warning text-dark status-badge">⏳ Εκκρεμεί</span>
+                                        {% elif req.status == 'Εγκρίθηκε' %}
+                                            <span class="badge bg-success status-badge">✅ Εγκρίθηκε</span>
+                                        {% else %}
+                                            <span class="badge bg-danger status-badge">❌ Απορρίφθηκε</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
                                 {% else %}
-                                    <tr>
-                                        <td colspan="4" class="text-center text-muted py-4">Δεν υπάρχουν καταχωρημένα αιτήματα.</td>
-                                    </tr>
-                                {% endif %}
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted py-4">Δεν υπάρχουν καταχωρημένα αιτήματα.</td>
+                                </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var dateInput = document.getElementById('requestDate');
+            var form = document.getElementById('carRequestForm');
+            
+            // 1. Κλειδώνουμε αυτόματα τις περασμένες ημερομηνίες στο ημερολόγιο
+            var today = new Date();
+            var dd = String(today.getDate()).padStart(2, '0');
+            var mm = String(today.getMonth() + 1).padStart(2, '0'); // Ιανουάριος είναι 0
+            var yyyy = today.getFullYear();
+            var todayString = yyyy + '-' + mm + '-' + dd;
+            
+            // Το 'min' attribute εμποδίζει την επιλογή προηγούμενων ημερών
+            dateInput.setAttribute('min', todayString);
+
+            // 2. Έλεγχος κατά την υποβολή της φόρμας για την ώρα της ίδιας μέρας
+            form.addEventListener('submit', function(event) {
+                var selectedDate = dateInput.value;
+                var timeFromInput = document.getElementById('timeFrom').value;
+                var timeToInput = document.getElementById('timeTo').value;
+                
+                var now = new Date();
+                var currentHours = String(now.getHours()).padStart(2, '0');
+                var currentMinutes = String(now.getMinutes()).padStart(2, '0');
+                var currentTimeString = currentHours + ':' + currentMinutes;
+
+                // Αν επιλεχθεί η σημερινή μέρα, έλεγξε την ώρα
+                if (selectedDate === todayString) {
+                    if (timeFromInput < currentTimeString) {
+                        alert('Δεν μπορείτε να επιλέξετε ώρα που έχει ήδη περάσει για σήμερα!');
+                        event.preventDefault(); // Σταματάει την υποβολή
+                        return false;
+                    }
+                }
+
+                // Έλεγχος αν η ώρα "Έως" είναι πριν από την ώρα "Από"
+                if (timeToInput <= timeFromInput) {
+                    alert('Η ώρα λήξης πρέπει να είναι μετά την ώρα έναρξης!');
+                    event.preventDefault();
+                    return false;
+                }
+            });
+        });
+    </script>
 </body>
 </html>
