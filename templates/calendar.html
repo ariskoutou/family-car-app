@@ -10,9 +10,29 @@
         body { background-color: #f8f9fa; font-family: 'Segoe UI', sans-serif; }
         .navbar { background-color: #343a40; }
         .card { border: none; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        #calendar { background: white; padding: 20px; border-radius: 12px; }
-        .fc-event { cursor: pointer; padding: 4px 6px; font-size: 0.9em; white-space: normal !important; }
-        .legend-box { width: 20px; height: 20px; border-radius: 4px; display: inline-block; vertical-align: middle; }
+        #calendar { background: white; padding: 15px; border-radius: 12px; }
+        .fc-event { cursor: pointer; padding: 4px 6px; font-size: 0.85em; white-space: normal !important; }
+        .legend-box { width: 18px; height: 18px; border-radius: 4px; display: inline-block; vertical-align: middle; }
+        
+        /* Διορθώσεις για μικρές οθόνες (Κινητά) */
+        @media (max-width: 768px) {
+            .card { padding: 12px !important; }
+            #calendar { padding: 5px; }
+            
+            /* Μικραίνουμε τον τίτλο και τα κουμπιά του ημερολογίου */
+            .fc .fc-toolbar-title { font-size: 1.1rem !important; }
+            .fc .fc-button { padding: 0.25rem 0.5rem !important; font-size: 0.85rem !important; }
+            .fc .fc-toolbar { flex-direction: row !important; gap: 5px; }
+            
+            /* Κρύβουμε τη στήλη με τις ώρες στα αριστερά για να κερδίσουμε χώρο */
+            .fc-timegrid-axis, .fc-timegrid-slot-label { display: none !important; }
+            /* Κρύβουμε το all-day row */
+            .fc-daygrid-body-unbalanced { display: none !important; }
+            .fc .fc-timegrid-slots td { height: 2.5em !important; } /* Κάνει τα κουτάκια της ώρας πιο ευρύχωρα */
+            
+            /* Μικραίνουμε τα γράμματα στις μέρες */
+            .fc-col-header-cell-cushion { font-size: 0.85rem !important; padding: 2px !important; }
+        }
     </style>
 </head>
 <body>
@@ -30,15 +50,15 @@
     <div class="container mb-5">
         <div class="card p-4 mb-4">
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                <h2 class="fw-bold text-secondary mb-0">📅 Πρόγραμμα Αυτοκινήτου</h2>
-                <div>
-                    <span class="me-3"><span class="legend-box" style="background-color: #198754;"></span> ✅ Εγκεκριμένο</span>
-                    <span><span class="legend-box" style="background-color: #ffc107;"></span> ⏳ Εκκρεμεί</span>
+                <h2 class="fw-bold text-secondary mb-0 fs-4">📅 Πρόγραμμα Αυτοκινήτου</h2>
+                <div class="small">
+                    <span class="me-2"><span class="legend-box" style="background-color: #198754;"></span> ✅ Εγκρ.</span>
+                    <span><span class="legend-box" style="background-color: #ffc107;"></span> ⏳ Εκκρ.</span>
                 </div>
             </div>
         </div>
 
-        <div class="card p-3">
+        <div class="card p-2 p-md-3">
             <div id="calendar"></div>
         </div>
     </div>
@@ -54,6 +74,8 @@
                 initialView: 'timeGridWeek', 
                 locale: 'el', 
                 firstDay: 1,  
+                allDaySlot: false, // Αφαιρεί τη γραμμή all-day από την κορυφή
+                slotEventOverlap: false,
                 headerToolbar: {
                     left: 'prev,next today', 
                     center: 'title',
