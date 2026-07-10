@@ -6,29 +6,76 @@
     <title>Είσοδος Γονέων - Family Car Planner</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f8f9fa; font-family: 'Segoe UI', sans-serif; transition: background-color 0.3s, color 0.3s; }
-        .navbar { background-color: #343a40; }
-        .card { border: none; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); max-width: 400px; margin: 0 auto; transition: background-color 0.3s; }
-        .btn-dark { background-color: #212529; }
+        /* Premium Background Gradient */
+        body { 
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); 
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            min-height: 100vh;
+            transition: background 0.4s, color 0.4s; 
+        }
+        
+        /* Glassmorphism Navbar */
+        .navbar { 
+            background: rgba(52, 58, 64, 0.85) !important; 
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Glassmorphism Card */
+        .card { 
+            background: rgba(255, 255, 255, 0.75); 
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 16px; 
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+            max-width: 400px; 
+            margin: 0 auto; 
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+        
+        .btn-dark { 
+            background: linear-gradient(135deg, #212529 0%, #343a40 100%); 
+            border: none;
+            border-radius: 10px;
+            transition: transform 0.2s;
+        }
+        .btn-dark:hover {
+            transform: translateY(-2px);
+        }
 
-        /* DARK MODE */
-        body.dark-mode { background-color: #121212; color: #f8f9fa; }
-        body.dark-mode .card { background-color: #1e1e1e; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-        body.dark-mode .text-secondary { color: #e0e0e0 !important; }
-        body.dark-mode .form-label { color: #f8f9fa; }
-        body.dark-mode .form-control { background-color: #2d2d2d; border-color: #444; color: #fff; }
-        body.dark-mode .btn-dark { background-color: #fff; color: #212529; border: none; }
-        body.dark-mode .btn-dark:hover { background-color: #e0e0e0; }
+        /* DEEP SPACE DARK MODE */
+        body.dark-mode { 
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); 
+            color: #f8f9fa; 
+        }
+        body.dark-mode .card { 
+            background: rgba(30, 41, 59, 0.7); 
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+        body.dark-mode .text-secondary { color: #cbd5e1 !important; }
+        body.dark-mode .form-label { color: #f1f5f9; }
+        body.dark-mode .form-control { 
+            background: rgba(15, 23, 42, 0.6); 
+            border-color: rgba(255, 255, 255, 0.1); 
+            color: #fff; 
+        }
+        body.dark-mode .btn-dark { 
+            background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%); 
+            color: #0f172a; 
+        }
     </style>
 </head>
 <body>
 
-    <nav class="navbar navbar-expand-lg navbar-dark mb-5">
+    <nav class="navbar navbar-expand-lg navbar-dark mb-5 sticky-top">
         <div class="container">
             <a class="navbar-brand fw-bold" href="/">🚗 Family Car Planner</a>
             <div class="ms-auto d-flex align-items-center">
-                <button id="darkModeToggle" class="btn btn-outline-light btn-sm me-2">🌙</button>
-                <a href="/" class="btn btn-outline-light btn-sm">🏠 Αρχική</a>
+                <button id="darkModeToggle" class="btn btn-outline-light btn-sm me-2" style="border-radius: 8px;">🌙</button>
+                <a href="/" class="btn btn-outline-light btn-sm" style="border-radius: 8px;">🏠 Αρχική</a>
             </div>
         </div>
     </nav>
@@ -39,7 +86,7 @@
           {% if messages %}
             <div style="max-width: 400px; margin: 0 auto;">
             {% for category, message in messages %}
-              <div class="alert alert-{{ category }} alert-dismissible fade show text-center" role="alert">
+              <div class="alert alert-{{ category }} alert-dismissible fade show text-center shadow-sm" style="border-radius: 12px;" role="alert">
                 {{ message }}
               </div>
             {% endfor %}
@@ -52,7 +99,7 @@
             <form action="/parents" method="POST">
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Εισάγετε τον Κωδικό Πρόσβασης</label>
-                    <input type="password" class="form-control text-center" name="password" placeholder="••••" required>
+                    <input type="password" class="form-control text-center" name="password" style="border-radius: 10px; height: 45px;" placeholder="••••" required>
                 </div>
                 <button type="submit" class="btn btn-dark w-100 fw-bold py-2 mb-3">Είσοδος</button>
             </form>
@@ -67,14 +114,14 @@
             <form action="/parents/change-password" method="POST">
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Παλιός Κωδικός</label>
-                    <input type="password" class="form-control" name="old_password" required>
+                    <input type="password" class="form-control" name="old_password" style="border-radius: 10px;" required>
                 </div>
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Νέος Κωδικός</label>
-                    <input type="password" class="form-control" name="new_password" required>
+                    <input type="password" class="form-control" name="new_password" style="border-radius: 10px;" required>
                 </div>
                 <button type="submit" class="btn btn-primary w-100 fw-bold py-2 mb-2">Αποθήκευση Νέου Κωδικού</button>
-                <button type="button" class="btn btn-light w-100 btn-sm" onclick="toggleForms()">Ακύρωση</button>
+                <button type="button" class="btn btn-light w-100 btn-sm" style="border-radius: 10px;" onclick="toggleForms()">Ακύρωση</button>
             </form>
         </div>
 
