@@ -2,7 +2,7 @@ import os
 import sqlite3
 import json
 from datetime import datetime, date as dt_date
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash
 
 app = Flask(__name__)
 app.secret_key = 'family_secret_key_123'
@@ -43,21 +43,49 @@ def index():
     if request.method == 'POST':
         driver = request.form.get('driver')
         date = request.form.get('date')
-        
         time_from = request.form.get('time_from')
         time_to = request.form.get('time_to')
-        full_time = f"{time_from} - {time_to}"
-        
         reason = request.form.get('reason')
 
         conn = get_db_connection()
+        # Παίρνουμε μόνο τα ΕΓΚΕΚΡΙΜΕΝΑ αιτήματα για τη συγκεκριμένη ημερομηνία
+        approved_requests = conn.execute(
+            "SELECT * FROM car_requests WHERE date = ? AND status = 'Εγκρίθηκε'", (date,)
+        ).fetchall()
+
+        # Έλεγχος για επικάλυψη ωρών (Overlap)
+        overlap = False
+        conflicting_driver = ""
+        conflicting_time = ""
+
+        for req in approved_requests:
+            try:
+                # Χωρίζουμε το υπάρχον "HH:MM - HH:MM" σε Από και Έως
+                req_from, req_to = req['time'].split(' - ')
+                
+                # Μαθηματικός έλεγχος επικάλυψης: (Έναρξη1 < Λήξη2) ΚΑΙ (Λήξη1 > Έναρξη2)
+                if time_from < req_to and time_to > req_from:
+                    overlap = True
+                    conflicting_driver = req['driver']
+                    conflicting_time = req['time']
+                    break
+            except:
+                continue
+
+        if overlap:
+            conn.close()
+            flash(f'❌ Το αυτοκίνητο είναι ήδη κλεισμένο από τον/την {conflicting_driver} ({conflicting_time})!', 'danger')
+            return redirect(url_for('index'))
+
+        # Αν δεν υπάρχει επικάλυψη, αποθηκεύουμε κανονικά
+        full_time = f"{time_from} - {time_to}"
         conn.execute('INSERT INTO car_requests (driver, date, time, reason) VALUES (?, ?, ?, ?)',
                      (driver, date, full_time, reason))
         conn.commit()
         conn.close()
+        flash('✅ Το αίτημα υποβλήθηκε με επιτυχία και εκκρεμεί έγκριση!', 'success')
         return redirect(url_for('index'))
 
-    # Φιλτράρισμα: Παίρνουμε μόνο τα αιτήματα που η ημερομηνία τους είναι σημερινή ή μελλοντική
     today_str = dt_date.today().strftime('%Y-%m-%d')
     conn = get_db_connection()
     raw_requests = conn.execute('SELECT * FROM car_requests WHERE date >= ? ORDER BY id DESC', (today_str,)).fetchall()
@@ -141,7 +169,6 @@ def change_password():
 
 @app.route('/parents/dashboard')
 def parents_dashboard():
-    # Φιλτράρισμα και στο dashboard των γονέων για να μην βλέπουν παλιά εκκρεμή
     today_str = dt_date.today().strftime('%Y-%m-%d')
     conn = get_db_connection()
     raw_requests = conn.execute("SELECT * FROM car_requests WHERE status = 'Εκκρεμεί' AND date >= ? ORDER BY id DESC", (today_str,)).fetchall()
