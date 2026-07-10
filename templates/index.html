@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Family Car Planner</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         /* Premium Background Gradient */
         body { 
@@ -12,9 +13,26 @@
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
             min-height: 100vh;
             transition: background 0.4s, color 0.4s; 
+            opacity: 0; /* Για το εισαγωγικό animation */
+            animation: fadeInPage 0.6s ease-out forwards;
         }
         
-        /* Modern Glassmorphism Navbar */
+        /* Animations Φόρτωσης */
+        @keyframes fadeInPage {
+            to { opacity: 1; }
+        }
+        .animate-card {
+            animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+        }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Glassmorphism Navbar */
         .navbar { 
             background: rgba(52, 58, 64, 0.85) !important; 
             backdrop-filter: blur(10px);
@@ -43,7 +61,6 @@
         .btn-primary:hover { 
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(13, 110, 253, 0.4);
-            background: linear-gradient(135deg, #0b5ed7 0%, #003fa3 100%);
         }
         
         .btn-warning {
@@ -57,10 +74,42 @@
             box-shadow: 0 5px 15px rgba(255, 193, 7, 0.4);
         }
 
-        .status-badge { font-size: 0.85rem; padding: 6px 14px; border-radius: 20px; fw-bold; }
-        .clickable-block { cursor: pointer; height: 48px; border-radius: 10px; }
+        /* Στυλ για τα Avatars των Οδηγών */
+        .avatar-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-right: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .avatar-aris { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+        .avatar-chris { background: linear-gradient(135deg, #ec4899, #be185d); }
 
-        /* ΦΟΥΤΟΥΡΙΣΤΙΚΟ DARK MODE (Deep Space Style) */
+        /* Custom Neon Glow Badges */
+        .status-badge { 
+            font-size: 0.8rem; 
+            padding: 6px 14px; 
+            border-radius: 20px; 
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .badge-pending { background-color: #fef3c7; color: #d97706; border: 1px solid #fde68a; }
+        .badge-approved { background-color: #d1fae5; color: #059669; border: 1px solid #a7f3d0; }
+        .badge-rejected { background-color: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
+
+        .clickable-block { cursor: pointer; height: 48px; border-radius: 10px; padding-left: 12px; }
+        .input-group-text { background: transparent; border-right: none; border-radius: 10px 0 0 10px; color: #6c757d; }
+        .has-icon .form-control, .has-icon .form-select { border-left: none; border-radius: 0 10px 10px 0; }
+
+        /* DEEP SPACE DARK MODE */
         body.dark-mode { 
             background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); 
             color: #f8f9fa; 
@@ -72,7 +121,7 @@
         }
         body.dark-mode .text-secondary { color: #cbd5e1 !important; }
         body.dark-mode .form-label { color: #f1f5f9; }
-        body.dark-mode .form-control, body.dark-mode .form-select { 
+        body.dark-mode .form-control, body.dark-mode .form-select, body.dark-mode .input-group-text { 
             background: rgba(15, 23, 42, 0.6); 
             border-color: rgba(255, 255, 255, 0.1); 
             color: #fff; 
@@ -82,17 +131,22 @@
         body.dark-mode .table th, body.dark-mode .table td { background-color: transparent !important; color: #f1f5f9 !important; }
         body.dark-mode .table-light th { background: rgba(51, 65, 85, 0.5) !important; color: #fff !important; border-color: rgba(255,255,255,0.1); }
         body.dark-mode .table-hover tbody tr:hover td { background-color: rgba(255, 255, 255, 0.05) !important; }
+        
+        /* Neon Glow στα Badges στο Dark Mode */
+        body.dark-mode .badge-pending { background: rgba(217, 119, 6, 0.15); color: #fbbf24; border-color: rgba(251, 191, 36, 0.4); box-shadow: 0 0 10px rgba(251, 191, 36, 0.15); }
+        body.dark-mode .badge-approved { background: rgba(5, 150, 105, 0.15); color: #34d399; border-color: rgba(52, 211, 153, 0.4); box-shadow: 0 0 10px rgba(52, 211, 153, 0.15); }
+        body.dark-mode .badge-rejected { background: rgba(220, 38, 38, 0.15); color: #f87171; border-color: rgba(248, 113, 113, 0.4); box-shadow: 0 0 10px rgba(248, 113, 113, 0.15); }
     </style>
 </head>
 <body>
 
     <nav class="navbar navbar-expand-lg navbar-dark mb-4 sticky-top">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="/">🚗 Family Car Planner</a>
+            <a class="navbar-brand fw-bold" href="/"><i class="fa-solid au fa-car me-2"></i> Family Car Planner</a>
             <div class="ms-auto d-flex align-items-center">
-                <button id="darkModeToggle" class="btn btn-outline-light btn-sm me-2" style="border-radius: 8px;">🌙</button>
-                <a href="/calendar" class="btn btn-warning btn-sm me-2 fw-bold">📅 Δες το Πρόγραμμα</a>
-                <a href="/parents" class="btn btn-outline-light btn-sm" style="border-radius: 8px;">🔒 Περιοχή Γονέων</a>
+                <button id="darkModeToggle" class="btn btn-outline-light btn-sm me-2" style="border-radius: 8px;"><i class="fa-solid fa-moon"></i></button>
+                <a href="/calendar" class="btn btn-warning btn-sm me-2 fw-bold"><i class="fa-solid fa-calendar-days me-1"></i> Πρόγραμμα</a>
+                <a href="/parents" class="btn btn-outline-light btn-sm" style="border-radius: 8px;"><i class="fa-solid fa-lock me-1"></i> Γονείς</a>
             </div>
         </div>
     </nav>
@@ -102,7 +156,7 @@
         {% with messages = get_flashed_messages(with_categories=true) %}
           {% if messages %}
             {% for category, message in messages %}
-              <div class="alert alert-{{ category }} alert-dismissible fade show text-center fw-bold mb-4 shadow-sm" style="border-radius: 12px;" role="alert">
+              <div class="alert alert-{{ category }} text-center fw-bold mb-4 shadow-sm" style="border-radius: 12px;" role="alert">
                 {{ message }}
               </div>
             {% endfor %}
@@ -111,37 +165,49 @@
 
         <div class="row g-4">
             
-            <div class="col-lg-5">
+            <div class="col-lg-5 col-12 animate-card delay-1">
                 <div class="card p-4">
-                    <h3 class="fw-bold text-secondary mb-4">Νέο Αίτημα</h3>
+                    <h3 class="fw-bold text-secondary mb-4"><i class="fa-solid fa-pen-to-square me-2"></i>Νέο Αίτημα</h3>
                     <form action="/" method="POST" id="carRequestForm">
                         
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Ποιος θα οδηγήσει;</label>
-                            <select class="form-select clickable-block" name="driver" required>
-                                <option value="" disabled selected>Επιλέξτε όνομα...</option>
-                                <option value="Άρης">Άρης</option>
-                                <option value="Χριστιάννα">Χριστιάννα</option>
-                            </select>
+                            <div class="input-group has-icon">
+                                <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
+                                <select class="form-select clickable-block" name="driver" required>
+                                    <option value="" disabled selected>Επιλέξτε όνομα...</option>
+                                    <option value="Άρης">Άρης</option>
+                                    <option value="Χριστιάννα">Χριστιάννα</option>
+                                </select>
+                            </div>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Ημερομηνία</label>
-                            <input type="date" class="form-control clickable-block" name="date" id="requestDate" onclick="this.showPicker()" required>
+                            <div class="input-group has-icon">
+                                <span class="input-group-text"><i class="fa-solid fa-calendar-check"></i></span>
+                                <input type="date" class="form-control clickable-block" name="date" id="requestDate" onclick="this.showPicker()" required>
+                            </div>
                         </div>
 
                         <div class="row g-2 mb-3">
                             <div class="col">
                                 <label class="form-label fw-semibold">Από</label>
-                                <select class="form-select clickable-block" name="time_from" id="timeFrom" required>
-                                    <option value="" disabled selected>--:--</option>
-                                </select>
+                                <div class="input-group has-icon">
+                                    <span class="input-group-text"><i class="fa-solid fa-clock"></i></span>
+                                    <select class="form-select clickable-block" name="time_from" id="timeFrom" required>
+                                        <option value="" disabled selected>--:--</option>
+                                    </select>
+                                </div>
                             </div>
                             <div class="col">
                                 <label class="form-label fw-semibold">Έως</label>
-                                <select class="form-select clickable-block" name="time_to" id="timeTo" required>
-                                    <option value="" disabled selected>--:--</option>
-                                </select>
+                                <div class="input-group has-icon">
+                                    <span class="input-group-text"><i class="fa-solid fa-clock"></i></span>
+                                    <select class="form-select clickable-block" name="time_to" id="timeTo" required>
+                                        <option value="" disabled selected>--:--</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
 
@@ -150,14 +216,14 @@
                             <textarea class="form-control" name="reason" rows="3" style="border-radius: 10px;" placeholder="π.χ. Προπόνηση, Καφές με φίλους..." required></textarea>
                         </div>
 
-                        <button type="submit" class="btn btn-primary w-100 fw-bold py-2fs-5">Υποβολή Αιτήματος</button>
+                        <button type="submit" class="btn btn-primary w-100 fw-bold py-2 fs-5"><i class="fa-solid fa-paper-plane me-2"></i>Υποβολή</button>
                     </form>
                 </div>
             </div>
 
-            <div class="col-lg-7">
+            <div class="col-lg-7 col-12 animate-card delay-2">
                 <div class="card p-4">
-                    <h3 class="fw-bold text-secondary mb-4">Ιστορικό Αιτημάτων</h3>
+                    <h3 class="fw-bold text-secondary mb-4"><i class="fa-solid fa-clock-history me-2"></i>Ιστορικό Αιτημάτων</h3>
                     <div class="table-responsive">
                         <table class="table table-hover align-middle mb-0">
                             <thead class="table-light">
@@ -171,16 +237,23 @@
                             <tbody>
                                 {% for req in requests %}
                                 <tr>
-                                    <td class="fw-bold text-primary">{{ req.driver }}</td>
+                                    <td class="fw-bold">
+                                        {% if req.driver == 'Άρης' %}
+                                            <span class="avatar-circle avatar-aris">Α</span>
+                                        {% else %}
+                                            <span class="avatar-circle avatar-chris">Χ</span>
+                                        {% endif %}
+                                        <span class="align-middle">{{ req.driver }}</span>
+                                    </td>
                                     <td>{{ req.date }}</td>
                                     <td class="fw-semibold">{{ req.time }}</td>
                                     <td>
                                         {% if req.status == 'Εκκρεμεί' %}
-                                            <span class="badge bg-warning text-dark status-badge">⏳ Εκκρεμεί</span>
+                                            <span class="status-badge badge-pending"><i class="fa-solid fa-hourglass-half"></i> Εκκρεμεί</span>
                                         {% elif req.status == 'Εγκρίθηκε' %}
-                                            <span class="badge bg-success status-badge">✅ Εγκρίθηκε</span>
+                                            <span class="status-badge badge-approved"><i class="fa-solid fa-circle-check"></i> Εγκρίθηκε</span>
                                         {% else %}
-                                            <span class="badge bg-danger status-badge">❌ Απορρίφθηκε</span>
+                                            <span class="status-badge badge-rejected"><i class="fa-solid fa-circle-xmark"></i> Απορρίφθηκε</span>
                                         {% endif %}
                                     </td>
                                 </tr>
@@ -201,20 +274,21 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             var toggleBtn = document.getElementById('darkModeToggle');
+            var icon = toggleBtn.querySelector('i');
             
             if (localStorage.getItem('theme') === 'dark') {
                 document.body.classList.add('dark-mode');
-                toggleBtn.textContent = '☀️';
+                icon.className = 'fa-solid fa-sun';
             }
 
             toggleBtn.addEventListener('click', function() {
                 document.body.classList.toggle('dark-mode');
                 if (document.body.classList.contains('dark-mode')) {
                     localStorage.setItem('theme', 'dark');
-                    toggleBtn.textContent = '☀️';
+                    icon.className = 'fa-solid fa-sun';
                 } else {
                     localStorage.setItem('theme', 'light');
-                    toggleBtn.textContent = '🌙';
+                    icon.className = 'fa-solid fa-moon';
                 }
             });
 
