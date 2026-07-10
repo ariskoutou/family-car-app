@@ -21,8 +21,6 @@
         body.dark-mode .form-label { color: #f8f9fa; }
         body.dark-mode .form-control, body.dark-mode .form-select { background-color: #2d2d2d; border-color: #444; color: #fff; }
         body.dark-mode .form-control::placeholder { color: #aaa; }
-        
-        /* ΔΙΟΡΘΩΣΗ ΓΙΑ ΤΟΝ ΠΙΝΑΚΑ ΣΤΟ DARK MODE */
         body.dark-mode .table { --bs-table-bg: #1e1e1e; --bs-table-color: #fff; border-color: #444; }
         body.dark-mode .table th, body.dark-mode .table td { background-color: #1e1e1e !important; color: #fff !important; }
         body.dark-mode .table-light th { background-color: #2d2d2d !important; color: #fff !important; border-color: #444; }
@@ -43,6 +41,17 @@
     </nav>
 
     <div class="container mb-5">
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }} alert-dismissible fade show text-center fw-bold mb-4" role="alert">
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
         <div class="row g-4">
             
             <div class="col-lg-5">
