@@ -3,48 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Πρόγραμμα Αυτοκινήτου - Family Car Planner</title>
+    <title>Πρόγραμμα - Family Car Planner</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f8f9fa; font-family: 'Segoe UI', sans-serif; transition: background-color 0.3s, color 0.3s; }
-        .navbar { background-color: #343a40; }
-        .card { border: none; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: background-color 0.3s; }
+        /* Premium Background Gradient */
+        body { 
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); 
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            min-height: 100vh;
+            transition: background 0.4s, color 0.4s; 
+        }
         
-        /* DARK MODE ΓΙΑ ΤΟ ΗΜΕΡΟΛΟΓΙΟ */
-        body.dark-mode { background-color: #121212; color: #f8f9fa; }
-        body.dark-mode .card { background-color: #1e1e1e; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-        body.dark-mode .text-secondary { color: #e0e0e0 !important; }
+        /* Glassmorphism Navbar */
+        .navbar { 
+            background: rgba(52, 58, 64, 0.85) !important; 
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Glassmorphism Cards */
+        .card { 
+            background: rgba(255, 255, 255, 0.75); 
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 16px; 
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+            transition: background-color 0.3s, box-shadow 0.3s; 
+        }
+        
+        #calendar { background: transparent; padding: 10px; border-radius: 12px; }
+        .fc-event { cursor: pointer; padding: 4px 6px; font-size: 0.85em; white-space: normal !important; border-radius: 6px; }
+        .legend-box { width: 18px; height: 18px; border-radius: 4px; display: inline-block; vertical-align: middle; }
+        
+        /* Κουμπιά FullCalendar */
+        .fc .fc-button-primary {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%) !important;
+            border: none !important;
+            border-radius: 8px !important;
+        }
+        .fc .fc-button-primary:hover {
+            background: linear-gradient(135deg, #495057 0%, #343a40 100%) !important;
+        }
+        
+        /* Mobile βελτιστοποιήσεις */
+        @media (max-width: 768px) {
+            .card { padding: 12px !important; }
+            .fc .fc-toolbar-title { font-size: 1.1rem !important; }
+            .fc .fc-button { padding: 0.25rem 0.5rem !important; font-size: 0.85rem !important; }
+            .fc-timegrid-axis, .fc-timegrid-slot-label { display: none !important; }
+            .fc-daygrid-body-unbalanced { display: none !important; }
+            .fc .fc-timegrid-slots td { height: 2.5em !important; }
+            .fc-col-header-cell-cushion { font-size: 0.85rem !important; padding: 2px !important; }
+        }
+
+        /* DEEP SPACE DARK MODE */
+        body.dark-mode { 
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); 
+            color: #f8f9fa; 
+        }
+        body.dark-mode .card { 
+            background: rgba(30, 41, 59, 0.7); 
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+        body.dark-mode .text-secondary { color: #cbd5e1 !important; }
         body.dark-mode .fc { color: #fff; }
-        body.dark-mode .fc td, body.dark-mode .fc th { border-color: #444 !important; }
-        body.dark-mode .fc-theme-standard .fc-scrollgrid { border-color: #444 !important; }
-        body.dark-mode .fc-col-header-cell { background-color: #2d2d2d; }
-        body.dark-mode .fc-daygrid-day { background-color: #1e1e1e; }
+        body.dark-mode .fc td, body.dark-mode .fc th { border-color: rgba(255, 255, 255, 0.1) !important; }
+        body.dark-mode .fc-theme-standard .fc-scrollgrid { border-color: rgba(255, 255, 255, 0.1) !important; }
+        body.dark-mode .fc-col-header-cell { background: rgba(15, 23, 42, 0.6); }
+        body.dark-mode .fc-daygrid-day { background: transparent; }
+        body.dark-mode .fc-timegrid-slot { background: transparent; }
     </style>
 </head>
 <body>
 
-    <nav class="navbar navbar-expand-lg navbar-dark mb-4">
+    <nav class="navbar navbar-expand-lg navbar-dark mb-4 sticky-top">
         <div class="container">
             <a class="navbar-brand fw-bold" href="/">🚗 Family Car Planner</a>
             <div class="ms-auto d-flex align-items-center">
-                <button id="darkModeToggle" class="btn btn-outline-light btn-sm me-2">🌙</button>
-                <a href="/" class="btn btn-outline-light btn-sm">🏠 Αρχική</a>
+                <button id="darkModeToggle" class="btn btn-outline-light btn-sm me-2" style="border-radius: 8px;">🌙</button>
+                <a href="/" class="btn btn-outline-light btn-sm" style="border-radius: 8px;">🏠 Αρχική</a>
             </div>
         </div>
     </nav>
 
     <div class="container mb-5">
-        <div class="card p-4">
-            <h2 class="fw-bold text-secondary mb-4 text-center">📅 Εβδομαδιαίο Πρόγραμμα Χρήσης</h2>
+        <div class="card p-4 mb-4">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <h2 class="fw-bold text-secondary mb-0 fs-4">📅 Πρόγραμμα Αυτοκινήτου</h2>
+                <div class="small fw-semibold">
+                    <span class="me-2"><span class="legend-box" style="background-color: #198754;"></span> ✅ Εγκρ.</span>
+                    <span><span class="legend-box" style="background-color: #ffc107;"></span> ⏳ Εκκρ.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card p-2 p-md-3">
             <div id="calendar"></div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/locales/el.global.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Λειτουργικότητα Dark Mode
             var toggleBtn = document.getElementById('darkModeToggle');
             if (localStorage.getItem('theme') === 'dark') {
                 document.body.classList.add('dark-mode');
@@ -62,33 +127,34 @@
             });
 
             var calendarEl = document.getElementById('calendar');
-            var eventsData = {{ events_json|safe }};
+            var eventsData = {{ events_json | safe }};
 
             var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'timeGridWeek',
-                locale: 'el',
-                firstDay: 1, 
+                initialView: 'timeGridWeek', 
+                locale: 'el', 
+                firstDay: 1,  
                 allDaySlot: false,
-                slotMinTime: '07:00:00',
-                slotMaxTime: '24:00:00',
+                slotEventOverlap: false,
                 headerToolbar: {
-                    left: 'prev,next today',
+                    left: 'prev,next today', 
                     center: 'title',
-                    right: 'timeGridWeek,dayGridMonth'
+                    right: '' 
                 },
                 buttonText: {
-                    today: 'Σήμερα',
-                    month: 'Μήνας',
-                    week: 'Εβδομάδα'
+                    today: 'Σήμερα'
                 },
                 events: eventsData,
-                eventClick: function(info) {
-                    if(info.event.extendedProps.description) {
-                        alert("Σκοπός: " + info.event.extendedProps.description);
+                eventContent: function(arg) {
+                    let titleEl = document.createElement('div');
+                    titleEl.innerHTML = '<b>' + arg.event.title + '</b>';
+                    return { domNodes: [titleEl] };
+                },
+                eventDidMount: function(info) {
+                    if (info.event.extendedProps.description) {
+                        info.el.setAttribute('title', info.event.extendedProps.description);
                     }
                 }
             });
-
             calendar.render();
         });
     </script>
