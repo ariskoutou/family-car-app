@@ -3,57 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Διαχείριση Γονέων</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <title>Dashboard Διαχείρισης - Family Car Planner</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f8f9fa; font-family: 'Segoe UI', sans-serif; }
-        .navbar { background-color: #212529; }
-        .card { border: none; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        /* Premium Background Gradient */
+        body { 
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); 
+            color: #f8f9fa;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            min-height: 100vh;
+            opacity: 0;
+            animation: fadeInPage 0.6s ease-out forwards;
+        }
+        
+        @keyframes fadeInPage {
+            to { opacity: 1; }
+        }
+        .animate-card {
+            animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Glassmorphism Navbar */
+        .navbar { 
+            background: rgba(15, 23, 42, 0.6) !important; 
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        
+        /* Glassmorphism Card */
+        .card { 
+            background: rgba(30, 41, 59, 0.7); 
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px; 
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        /* Στυλ για τα Avatars των Οδηγών */
+        .avatar-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-right: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .avatar-aris { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+        .avatar-chris { background: linear-gradient(135deg, #ec4899, #be185d); }
+
+        /* Modern Interactive Buttons */
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+            border: none;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+            border: none;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        .table { --bs-table-bg: transparent; --bs-table-color: #fff; border-color: rgba(255,255,255,0.1); }
+        .table th, .table td { background-color: transparent !important; color: #f1f5f9 !important; }
+        .table-light th { background: rgba(51, 65, 85, 0.5) !important; color: #fff !important; border-color: rgba(255,255,255,0.1); }
+        .table-hover tbody tr:hover td { background-color: rgba(255, 255, 255, 0.05) !important; }
     </style>
 </head>
 <body>
 
-    <nav class="navbar navbar-expand-lg navbar-dark mb-4">
+    <nav class="navbar navbar-expand-lg navbar-dark mb-4 sticky-top">
         <div class="container">
-            <span class="navbar-brand fw-bold">🛠️ Πίνακας Ελέγχου Γονέων</span>
+            <a class="navbar-brand fw-bold" href="/"><i class="fa-solid fa-car me-2"></i> Family Car Planner</a>
             <div class="ms-auto">
-                <a href="/" class="btn btn-outline-light btn-sm">Έξοδος</a>
+                <a href="/" class="btn btn-outline-light btn-sm" style="border-radius: 8px;"><i class="fa-solid fa-house me-1"></i> Αρχική</a>
             </div>
         </div>
     </nav>
 
-    <div class="container">
+    <div class="container mb-5 animate-card">
         <div class="card p-4">
-            <h4 class="fw-bold mb-4 text-dark">Εκκρεμή Αιτήματα για Έγκριση</h4>
+            <h2 class="fw-bold mb-4"><i class="fa-solid fa-gauge-high me-2 text-warning"></i>Εκκρεμή Αιτήματα προς Έγκριση</h2>
             
             <div class="table-responsive">
-                <table class="table align-middle">
+                <table class="table table-hover align-middle mb-0">
                     <thead class="table-light">
                         <tr>
                             <th>Οδηγός</th>
-                            <th>Ημερομηνία / Ώρα</th>
-                            <th>Σκοπός</th>
-                            <th class="text-end">Ενέργειες</th>
+                            <th>Ημερομηνία</th>
+                            <th>Ώρες</th>
+                            <th>Σκοπός / Προορισμός</th>
+                            <th class="text-center">Ενέργειες</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% if requests %}
-                            {% for req in requests %}
-                            <tr>
-                                <td class="fw-bold fs-5 text-primary">{{ req.driver }}</td>
-                                <td><strong>{{ req.date }}</strong> <br> <small class="text-muted">{{ req.time }}</small></td>
-                                <td>{{ req.reason }}</td>
-                                <td class="text-end">
-                                    <a href="/admin/decide/{{ req.id }}/approve" class="btn btn-success btn-sm fw-bold me-2">✅ Έγκριση</a>
-                                    <a href="/admin/decide/{{ req.id }}/reject" class="btn btn-danger btn-sm fw-bold">❌ Απόρριψη</a>
-                                </td>
-                            </tr>
-                            {% endfor %}
+                        {% for req in requests %}
+                        <tr>
+                            <td class="fw-bold">
+                                {% if req.driver == 'Άρης' %}
+                                    <span class="avatar-circle avatar-aris">Α</span>
+                                {% else %}
+                                    <span class="avatar-circle avatar-chris">Χ</span>
+                                {% endif %}
+                                <span class="align-middle">{{ req.driver }}</span>
+                            </td>
+                            <td><i class="fa-solid fa-calendar-day me-1 text-muted"></i> {{ req.date }}</td>
+                            <td class="fw-semibold"><i class="fa-solid fa-clock me-1 text-muted"></i> {{ req.time }}</td>
+                            <td class="text-muted">{{ req.reason }}</td>
+                            <td class="text-center">
+                                <a href="/admin/decide/{{ req.id }}/approve" class="btn btn-success btn-sm me-2 fw-bold">
+                                    <i class="fa-solid fa-check me-1"></i> Έγκριση
+                                </a>
+                                <a href="/admin/decide/{{ req.id }}/reject" class="btn btn-danger btn-sm fw-bold">
+                                    <i class="fa-solid fa-xmark me-1"></i> Απόρριψη
+                                </a>
+                            </td>
+                        </tr>
                         {% else %}
-                            <tr>
-                                <td colspan="4" class="text-center text-muted py-5 fs-5">🙌 Δεν υπάρχουν εκκρεμή αιτήματα προς το παρόν!</td>
-                            </tr>
-                        {% endif %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-5 fs-5">
+                                <i class="fa-solid fa-circle-check text-success d-block mb-2 fs-2"></i>
+                                Όλα καθαρά! Δεν υπάρχουν αιτήματα που εκκρεμούν.
+                            </td>
+                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
